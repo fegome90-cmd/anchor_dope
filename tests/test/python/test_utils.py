@@ -19,12 +19,12 @@ class TestIsValidSlug:
             ("", False),
             # Invalid: uppercase
             ("A", False),
+            ("Sprint_Invalido!", False),
             # Invalid: dash position
             ("-sprint", False),
             ("sprint-", False),
             ("sprint--doble", False),
             # Invalid: special chars
-            ("Sprint_Invalido!", False),
             ("a b", False),
             ("a_b", False),
             ("slug.muy.largo", False),

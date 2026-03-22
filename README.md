@@ -79,6 +79,19 @@ Inválidos: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
 
 Este proyecto tiene integración con [branch-review](https://github.com/fegome90-cmd/branch-review) para revisiones de código automatizadas.
 
+### Requisitos
+
+- **bun** instalado (runtime para el CLI de branch-review)
+- **branch-review** clonado en `~/Developer/branch-review/` (o setear `BRANCH_REVIEW_REPO`)
+- Opcional: `REVIEW_API_TOKEN` para modo API (sin él, usa modo local-direct)
+
+```bash
+# Variables de entorno opcionales
+export BRANCH_REVIEW_REPO=~/Developer/branch-review  # Path al repo
+export REVIEW_API_TOKEN=tu_token                     # Para modo API
+export BRANCH_REVIEW_API=http://localhost:3001       # URL de la API
+```
+
 ### Configuración
 
 Opcionalmente, configura `REVIEW_API_TOKEN` para usar el modo API. Sin él, el wrapper ejecuta en modo local-direct.

@@ -79,18 +79,33 @@ Inválidos: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
 
 Este proyecto tiene integración con [branch-review](https://github.com/fegome90-cmd/branch-review) para revisiones de código automatizadas.
 
+### Configuración
+
+Opcionalmente, configura `REVIEW_API_TOKEN` para usar el modo API. Sin él, el wrapper ejecuta en modo local-direct.
+
+```bash
+export REVIEW_API_TOKEN=tu_token  # Opcional
+```
+
+### Comandos
+
 ```bash
 # Cargar wrappers
 source scripts/reviewctl-wrappers/reviewctl-wrapper.sh
 
-# Flujo completo de revisión
+# Flujo completo (usa --reset para limpiar estado previo)
 reviewctl_full_workflow
+reviewctl_full_workflow --reset
 
-# O paso a paso
+# Paso a paso
 reviewctl_init      # Iniciar revisión
 reviewctl_plan      # Generar plan
 reviewctl_run       # Ejecutar agentes
 reviewctl_verdict   # Obtener veredicto (PASS/FAIL)
+
+# Comandos adicionales
+reviewctl_status    # Ver estado actual
+reviewctl_explore   # Explorar contexto/diff
 ```
 
 ## Docs para Agentes IA

@@ -74,3 +74,9 @@ _ctx/
 
 # Local development
 *.local
+
+# Internal plans (Prometheus)
+.sisyphus/
+
+# Temp exploration
+explore/

@@ -4,7 +4,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/shared/utils.sh"
 
-REQUIRED_FILES=("_ctx/ANCHOR.md" "_ctx/AGENTS.md" "_ctx/PRIME.md")
+REQUIRED_FILES=("ANCHOR.md" "AGENTS.md" "PRIME.md")
 PLANS_DIR="_ctx/plans"
 ACTIVE_PLAN_FILE="$PLANS_DIR/active_plan.json"
 

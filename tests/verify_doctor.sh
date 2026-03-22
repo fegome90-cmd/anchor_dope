@@ -31,10 +31,10 @@ function run_doctor_test() {
 
 function make_healthy_pack() {
     local dir="$1"
-    mkdir -p "$dir/_ctx"
-    touch "$dir/_ctx/ANCHOR.md"
-    touch "$dir/_ctx/AGENTS.md"
-    touch "$dir/_ctx/PRIME.md"
+    mkdir -p "$dir"
+    touch "$dir/ANCHOR.md"
+    touch "$dir/AGENTS.md"
+    touch "$dir/PRIME.md"
 }
 
 function main() {
@@ -94,10 +94,10 @@ function main() {
 
     # Test 7: Pack corrupto (falta 1 archivo)
     local corrupt1="$tmp_dir/corrupt1"
-    mkdir -p "$corrupt1/_ctx"
-    touch "$corrupt1/_ctx/ANCHOR.md"
-    touch "$corrupt1/_ctx/AGENTS.md"
-    if run_doctor_test "Pack corrupto (falta _ctx/PRIME.md) → exit 1" 1 bash "$DOCTOR_SCRIPT" "$corrupt1"; then
+    mkdir -p "$corrupt1"
+    touch "$corrupt1/ANCHOR.md"
+    touch "$corrupt1/AGENTS.md"
+    if run_doctor_test "Pack corrupto (falta PRIME.md) → exit 1" 1 bash "$DOCTOR_SCRIPT" "$corrupt1"; then
         pass=$((pass + 1))
     else
         fail=$((fail + 1))

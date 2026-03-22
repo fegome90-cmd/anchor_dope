@@ -50,7 +50,7 @@ function main() {
 
     # Test 1: Crear plan válido en _ctx/plans/
     if run_test "Crear plan válido" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "test-plan-01"; then
-        if [ -d "_ctx/plans/test-plan-01/_ctx" ] && [ -f "_ctx/plans/test-plan-01/_ctx/ANCHOR.md" ]; then
+        if [ -f "_ctx/plans/test-plan-01/ANCHOR.md" ]; then
             pass=$((pass + 1))
         else
             echo -e "${RED}FAIL:${NC} Plan no creado en _ctx/plans/test-plan-01/"
@@ -94,7 +94,7 @@ function main() {
     cd "$original_dir" || exit 1
     cd "$tmp_dir" || exit 1
     bash "$SCRIPTS_DIR/new_sprint_pack.sh" "slug-check" >/dev/null 2>&1
-    if [ -f "_ctx/plans/slug-check/_ctx/ANCHOR.md" ] && grep -q "slug-check" "_ctx/plans/slug-check/_ctx/ANCHOR.md" && ! grep -q "{{SLUG}}" "_ctx/plans/slug-check/_ctx/ANCHOR.md"; then
+    if [ -f "_ctx/plans/slug-check/ANCHOR.md" ] && grep -q "slug-check" "_ctx/plans/slug-check/ANCHOR.md" && ! grep -q "{{SLUG}}" "_ctx/plans/slug-check/ANCHOR.md"; then
         echo -e "${GREEN}PASS:${NC} Slug reemplazado en templates"
         pass=$((pass + 1))
     else

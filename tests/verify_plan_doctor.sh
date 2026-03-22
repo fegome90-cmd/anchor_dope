@@ -99,9 +99,9 @@ EOF
     fi
 
     # Test 7: Doctor con plan corrupto (falta ANCHOR.md)
-    mkdir -p "_ctx/plans/corrupt-plan/_ctx"
-    touch "_ctx/plans/corrupt-plan/_ctx/AGENTS.md"
-    touch "_ctx/plans/corrupt-plan/_ctx/PRIME.md"
+    mkdir -p "_ctx/plans/corrupt-plan"
+    touch "_ctx/plans/corrupt-plan/AGENTS.md"
+    touch "_ctx/plans/corrupt-plan/PRIME.md"
     if run_test "Doctor con plan corrupto" 1 bash "$DOCTOR_SCRIPT" "corrupt-plan"; then
         pass=$((pass + 1))
     else
@@ -109,10 +109,10 @@ EOF
     fi
 
     # Test 8: Doctor con directorio directo (compatibilidad)
-    mkdir -p "direct-pack/_ctx"
-    touch "direct-pack/_ctx/ANCHOR.md"
-    touch "direct-pack/_ctx/AGENTS.md"
-    touch "direct-pack/_ctx/PRIME.md"
+    mkdir -p "direct-pack"
+    touch "direct-pack/ANCHOR.md"
+    touch "direct-pack/AGENTS.md"
+    touch "direct-pack/PRIME.md"
     if run_test "Doctor con directorio directo" 0 bash "$DOCTOR_SCRIPT" "direct-pack"; then
         pass=$((pass + 1))
     else

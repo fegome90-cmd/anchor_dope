@@ -114,7 +114,7 @@ function main() {
 
     # Test 9: Templates se copian en _ctx/plans/
     if run_test "Templates copiados" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "test-templates"; then
-        if [ -f "_ctx/plans/test-templates/_ctx/ANCHOR.md" ] && [ -f "_ctx/plans/test-templates/SKILL.md" ] && [ -f "_ctx/plans/test-templates/_ctx/AGENTS.md" ] && [ -f "_ctx/plans/test-templates/_ctx/PRIME.md" ]; then
+        if [ -f "_ctx/plans/test-templates/ANCHOR.md" ] && [ -f "_ctx/plans/test-templates/SKILL.md" ] && [ -f "_ctx/plans/test-templates/AGENTS.md" ] && [ -f "_ctx/plans/test-templates/PRIME.md" ]; then
             pass=$((pass + 1))
         else
             echo -e "${RED}FAIL:${NC} Templates no copiados correctamente."
@@ -127,7 +127,7 @@ function main() {
 
     # Test 10: SLUG se reemplaza en templates
     if run_test "SLUG reemplazado en templates" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "my-slug-test"; then
-        if grep -q "my-slug-test" "_ctx/plans/my-slug-test/_ctx/ANCHOR.md" && ! grep -q "{{SLUG}}" "_ctx/plans/my-slug-test/_ctx/ANCHOR.md"; then
+        if grep -q "my-slug-test" "_ctx/plans/my-slug-test/ANCHOR.md" && ! grep -q "{{SLUG}}" "_ctx/plans/my-slug-test/ANCHOR.md"; then
             pass=$((pass + 1))
         else
             echo -e "${RED}FAIL:${NC} SLUG no se reemplazó en templates."

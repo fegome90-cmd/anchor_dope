@@ -48,27 +48,27 @@ function main() {
     local original_dir="$PWD"
     cd "$tmp_dir" || exit 1
 
-    # Test 1: Crear sprint pack válido
-    if run_test "Crear sprint pack válido" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "mi-sprint-01"; then
-        if [ -d "mi-sprint-01" ]; then
+    # Test 1: Crear plan válido en _ctx/plans/
+    if run_test "Crear plan válido" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "mi-sprint-01"; then
+        if [ -d "_ctx/plans/mi-sprint-01" ]; then
             pass=$((pass + 1))
         else
-            echo -e "${RED}FAIL:${NC} Directorio no creado."
+            echo -e "${RED}FAIL:${NC} Directorio no creado en _ctx/plans/."
             fail=$((fail + 1))
         fi
-        rm -rf "mi-sprint-01"
+        rm -rf "_ctx/plans/mi-sprint-01"
     else
         fail=$((fail + 1))
     fi
 
-    # Test 2: Colisión de directorio
-    mkdir -p "sprint-colision"
-    if run_test "Colisión de directorio" 1 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "sprint-colision"; then
+    # Test 2: Colisión de plan en _ctx/plans/
+    mkdir -p "_ctx/plans/sprint-colision"
+    if run_test "Colisión de plan" 1 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "sprint-colision"; then
         pass=$((pass + 1))
     else
         fail=$((fail + 1))
     fi
-    rm -rf "sprint-colision"
+    rm -rf "_ctx/plans/sprint-colision"
 
     # Test 3: Slug inválido con mayúsculas
     if run_test "Slug inválido con mayúsculas" 1 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "Sprint-Invalido"; then
@@ -112,28 +112,28 @@ function main() {
         fail=$((fail + 1))
     fi
 
-    # Test 9: Templates se copian (sin extensión .tmpl)
+    # Test 9: Templates se copian en _ctx/plans/
     if run_test "Templates copiados" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "test-templates"; then
-        if [ -f "test-templates/_ctx/ANCHOR.md" ] && [ -f "test-templates/SKILL.md" ] && [ -f "test-templates/_ctx/AGENTS.md" ] && [ -f "test-templates/_ctx/PRIME.md" ]; then
+        if [ -f "_ctx/plans/test-templates/_ctx/ANCHOR.md" ] && [ -f "_ctx/plans/test-templates/SKILL.md" ] && [ -f "_ctx/plans/test-templates/_ctx/AGENTS.md" ] && [ -f "_ctx/plans/test-templates/_ctx/PRIME.md" ]; then
             pass=$((pass + 1))
         else
             echo -e "${RED}FAIL:${NC} Templates no copiados correctamente."
             fail=$((fail + 1))
         fi
-        rm -rf "test-templates"
+        rm -rf "_ctx/plans/test-templates"
     else
         fail=$((fail + 1))
     fi
 
     # Test 10: SLUG se reemplaza en templates
     if run_test "SLUG reemplazado en templates" 0 bash "$SCRIPTS_DIR/new_sprint_pack.sh" "my-slug-test"; then
-        if grep -q "my-slug-test" "my-slug-test/_ctx/ANCHOR.md" && ! grep -q "{{SLUG}}" "my-slug-test/_ctx/ANCHOR.md"; then
+        if grep -q "my-slug-test" "_ctx/plans/my-slug-test/_ctx/ANCHOR.md" && ! grep -q "{{SLUG}}" "_ctx/plans/my-slug-test/_ctx/ANCHOR.md"; then
             pass=$((pass + 1))
         else
             echo -e "${RED}FAIL:${NC} SLUG no se reemplazó en templates."
             fail=$((fail + 1))
         fi
-        rm -rf "my-slug-test"
+        rm -rf "_ctx/plans/my-slug-test"
     else
         fail=$((fail + 1))
     fi

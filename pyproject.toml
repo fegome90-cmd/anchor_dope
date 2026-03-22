@@ -1,7 +1,7 @@
 [project]
-name = "content"
+name = "anchor_dope"
 version = "0.1.0"
-description = "Add your description here"
+description = "Sprint Pack Kit - Claude Code sprint management utilities"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
@@ -9,6 +9,7 @@ dependencies = []
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "C90", "UP"]
@@ -21,6 +22,19 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["-v", "--tb=short"]
+markers = [
+    "unit: marks tests as unit tests",
+    "integration: marks tests as integration tests",
+]
 
 [dependency-groups]
 dev = [

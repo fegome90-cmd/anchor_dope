@@ -10,12 +10,44 @@ done
 SPK_HOME="$(cd "$(dirname "$SOURCE")" && pwd)"
 source "$SPK_HOME/shared/utils.sh"
 
+function resolve_project_root() {
+    local start_dir="$1"
+
+    if [ -n "$SPK_REPO" ]; then
+        echo "$SPK_REPO"
+        return 0
+    fi
+
+    if git -C "$start_dir" rev-parse --show-toplevel 2>/dev/null; then
+        return 0
+    fi
+
+    local dir="$start_dir"
+    while [ "$dir" != "/" ]; do
+        if [ -d "$dir/_ctx" ]; then
+            echo "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+
+    echo -e "${RED}ERROR: No se encontró directorio del proyecto.${NC}" >&2
+    echo -e "${YELLOW}Opciones:${NC}" >&2
+    echo -e "  1. Ejecutar dentro de un repo git" >&2
+    echo -e "  2. Crear _ctx/ en la raíz del proyecto" >&2
+    echo -e "  3. Usar: SPK_REPO=/path spk <comando>${NC}" >&2
+    return 1
+}
+
 function usage() {
     cat <<EOM
 
 Sprint Pack Kit — CLI
 
-usage: spk <comando> [argumentos]
+usage: spk [--repo <path>] <comando> [argumentos]
+
+global:
+    --repo <path>      Directorio del proyecto (auto-detecta si no se especifica)
 
 comandos:
     new <slug>           Crear un nuevo sprint pack
@@ -32,10 +64,8 @@ opciones doctor:
 examples:
     spk new sprint-01
     spk doctor --active
+    spk --repo /path/to/project new sprint-01
     spk doctor sprint-01
-    spk doctor ./mi-pack
-    spk lint
-    spk test
 
 EOM
 }
@@ -46,30 +76,63 @@ function main() {
         exit 1
     fi
 
-    local cmd="$1"
-    shift
+    SPK_REPO=""
+    local cmd=""
+    local cmd_args=()
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --repo)
+            SPK_REPO="$2"
+            shift 2
+            ;;
+        --repo=*)
+            SPK_REPO="${1#--repo=}"
+            shift
+            ;;
+        -h | --help | help)
+            usage
+            return 0
+            ;;
+        *)
+            if [ -z "$cmd" ]; then
+                cmd="$1"
+            else
+                cmd_args+=("$1")
+            fi
+            shift
+            ;;
+        esac
+    done
+
+    if [ -z "$cmd" ]; then
+        usage
+        exit 1
+    fi
 
     case "$cmd" in
-    new)
-        bash "$SPK_HOME/new_sprint_pack.sh" "$@"
+    version)
+        echo "spk 1.0.0"
+        return 0
         ;;
-    doctor)
-        bash "$SPK_HOME/doctor.sh" "$@"
+    new | doctor)
+        local project_root
+        project_root=$(resolve_project_root "$(pwd)") || exit 1
+        local script_name
+        case "$cmd" in
+        new) script_name="new_sprint_pack" ;;
+        *) script_name="$cmd" ;;
+        esac
+        (cd "$project_root" && bash "$SPK_HOME/${script_name}.sh" "${cmd_args[@]}")
         ;;
     lint)
-        bash "$SPK_HOME/lint.sh" "$@"
+        bash "$SPK_HOME/lint.sh" "${cmd_args[@]}"
         ;;
     test)
         bash "$SPK_HOME/../tests/run_all.sh"
         ;;
-    version)
-        echo "spk 1.0.0"
-        ;;
-    -h | --help | help)
-        usage
-        ;;
     *)
-        echo "ERROR: Comando desconocido '$cmd'" >&2
+        echo -e "${RED}ERROR: Comando desconocido '$cmd'${NC}" >&2
         usage
         exit 1
         ;;

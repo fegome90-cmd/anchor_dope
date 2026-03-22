@@ -1,8 +1,8 @@
 import re
 
-__all__ = ["is_valid_slug", "SLUG_PATTERN"]
+__all__ = ["SLUG_PATTERN", "is_valid_slug", "re"]
 
-# Valid slugs contain lowercase letters, numbers, and single internal dashes.
+# Valid slugs contain lowercase letters, numbers, and non-consecutive internal dashes.
 SLUG_PATTERN: re.Pattern[str] = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 

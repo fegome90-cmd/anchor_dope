@@ -47,14 +47,14 @@ function resolve_plan_dir() {
         if [ ! -f "$ACTIVE_PLAN_FILE" ]; then
             echo -e "${RED}ERROR: No existe $ACTIVE_PLAN_FILE.${NC}" >&2
             echo -e "${YELLOW}Cree un plan primero con new_sprint_pack.sh <slug>.${NC}" >&2
-            exit 1
+            return 1
         fi
         local plan_path
-        plan_path=$(grep '"plan_path"' "$ACTIVE_PLAN_FILE" | sed 's/.*"plan_path": *"//;s/".*//')
+        plan_path=$(awk -F'"' '/"plan_path"/{for(i=1;i<=NF;i++)if($i=="plan_path"){v=$(i+2);if(v!="null"&&v!="")print v;exit}}' "$ACTIVE_PLAN_FILE")
         if [ "$plan_path" = "null" ] || [ -z "$plan_path" ]; then
             echo -e "${RED}ERROR: No hay plan activo en active_plan.json.${NC}" >&2
             echo -e "${YELLOW}Cree un plan con new_sprint_pack.sh <slug>.${NC}" >&2
-            exit 1
+            return 1
         fi
         echo "$plan_path"
         return 0
@@ -76,12 +76,14 @@ function resolve_plan_dir() {
         local found=0
         for d in "$PLANS_DIR"/*/; do
             [ -d "$d" ] || continue
-            echo -e "   $(basename "$d")"
+            local plan_name
+            plan_name=$(basename "${d%/}")
+            echo -e "   $plan_name"
             found=1
         done
         [ "$found" -eq 0 ] && echo -e "   (ninguno)"
     fi
-    exit 1
+    return 1
 }
 
 function main() {
@@ -97,7 +99,7 @@ function main() {
     esac
 
     local target_dir
-    target_dir=$(resolve_plan_dir "$1")
+    target_dir=$(resolve_plan_dir "$1") || exit 1
     target_dir="${target_dir%/}"
 
     if [ ! -d "$target_dir" ]; then

@@ -1,136 +1,106 @@
-# sprint-pack-kit
+# Sprint Pack Kit
 
-Herramienta de infraestructura mínima para materializar **sprint packs** de forma determinista y fail-closed.
+> Infraestructura mínima para materializar sprint packs de forma determinista y fail-closed.
 
-## Qué hace
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
-Genera una carpeta con los documentos del sprint (`ANCHOR.md`, `SKILL.md`, `AGENTS.md`, `PRIME.md`) a partir de un slug, garantizando que cada sprint tenga un contrato de contexto claro antes de la ejecución.
+Genera planes con documentos soberanos (`ANCHOR.md`, `SKILL.md`, `AGENTS.md`, `PRIME.md`) en `_ctx/plans/<plan-id>/`, garantizando que cada sprint tenga un contrato de contexto claro antes de la ejecución.
 
-```
-./scripts/new_sprint_pack.sh mi-feature
-```
+## Quick Start
 
-## Estructura
-
-```
-├── _ctx/
-│   ├── ANCHOR.md              # SSOT del proyecto
-│   ├── AGENTS.md              # Definición de roles
-│   └── PRIME.md               # Pre-flight checks
-├── README.md                  # Documentación de uso
-├── scripts/
-│   ├── new_sprint_pack.sh     # Generador de sprint packs
-│   ├── doctor.sh              # Validador de integridad
-│   ├── lint.sh                # ShellCheck linter
-│   ├── reviewctl-wrappers/    # Wrappers para branch-review
-│   └── shared/
-│       └── utils.sh           # Utilidades (validate_slug)
-├── templates/
-│   └── sprint_base/           # Templates .tmpl (ANCHOR, SKILL, AGENTS, PRIME)
-├── tests/
-│   ├── run_all.sh             # Test runner
-│   ├── verify_creation.sh     # Tests de creación y colisión
-│   ├── verify_doctor.sh       # Tests de doctor.sh
-│   ├── verify_lint_paths.sh   # Tests de lint.sh
-│   ├── verify_utils.sh        # Tests de validate_slug
-│   ├── verify_validation.sh   # Tests de validación de slugs
-│   └── test/python/           # Tests pytest
-├── src/
-│   └── utils.py               # Validación Python (is_valid_slug)
-├── Makefile                   # make lint, make test, make format
-└── pyproject.toml             # Config Python (ruff, mypy, pytest)
-```
-
-## Uso
-
-### Crear un sprint pack
 ```bash
-./scripts/new_sprint_pack.sh "mi-sprint-01"
+./scripts/new_sprint_pack.sh "auth-refactor"
+./scripts/doctor.sh --active
+./scripts/doctor.sh "auth-refactor"
+make all
 ```
 
-### Verificar integridad
-```bash
-./scripts/doctor.sh "mi-sprint-01"
+## What It Generates
+
+```
+_ctx/plans/
+├── active_plan.json              # Puntero mecánico (NO autoridad)
+│
+└── auth-refactor/
+    ├── SKILL.md                  # Puente operativo
+    └── _ctx/
+        ├── ANCHOR.md             # SSOT de este plan
+        ├── AGENTS.md             # Roles de este plan
+        └── PRIME.md              # Gates de este plan
 ```
 
-### Ejecutar tests
-```bash
-make test          # Bash + Python
-make shell-test    # Solo bash
-make python-test   # Solo pytest
-```
+## Commands
 
-### Lint
-```bash
-make lint          # ShellCheck + Mypy + Ruff
-```
+| Command | Description |
+|---------|-------------|
+| `./scripts/new_sprint_pack.sh <slug>` | Crear plan en `_ctx/plans/<slug>/` |
+| `./scripts/doctor.sh --active` | Auditar plan activo |
+| `./scripts/doctor.sh <plan-id>` | Auditar plan específico |
+| `./scripts/doctor.sh <path>` | Auditar directorio directo |
+| `make test` | Tests (Bash + Python) |
+| `make lint` | ShellCheck + Mypy + Ruff |
+| `make format` | Auto-format Python |
 
 ## Slug Rules
 
-Reglas canónicas en `_ctx/ANCHOR.md` → sección **Slug Rules**.
-
-- Solo minúsculas, números y guiones medios
+- Solo minúsculas, números y guiones medios (`a-z`, `0-9`, `-`)
 - No puede iniciar ni terminar con `-`
 - No puede tener guiones consecutivos (`--`)
 - Regex: `^[a-z0-9]+(-[a-z0-9]+)*$`
 
-Válidos: `sprint-01`, `mi-feature-alpha`, `v2`
-Inválidos: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
+**Válidos**: `sprint-01`, `auth-refactor`, `v2`
+**Inválidos**: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
 
-## Code Review con reviewctl
+## Project Structure
 
-Este proyecto tiene integración con [branch-review](https://github.com/fegome90-cmd/branch-review) para revisiones de código automatizadas.
-
-### Requisitos
-
-- **bun** instalado (runtime para el CLI de branch-review)
-- **branch-review** clonado en `~/Developer/branch-review/` (o setear `BRANCH_REVIEW_REPO`)
-- Opcional: `REVIEW_API_TOKEN` para modo API (sin él, usa modo local-direct)
-
-```bash
-# Variables de entorno opcionales
-export BRANCH_REVIEW_REPO=~/Developer/branch-review  # Path al repo
-export REVIEW_API_TOKEN=tu_token                     # Para modo API
-export BRANCH_REVIEW_API=http://localhost:3001       # URL de la API
+```
+├── _ctx/                         # Contexto del proyecto
+│   ├── ANCHOR.md                 # SSOT del proyecto
+│   ├── AGENTS.md, PRIME.md, SUMMARY.md, rules.json
+│   └── plans/                    # Namespace de planes
+│       ├── active_plan.json      # Puntero al plan activo
+│       └── <plan-id>/            # Planes individuales
+├── scripts/
+│   ├── new_sprint_pack.sh        # Scaffolder
+│   ├── doctor.sh                 # Verificador
+│   ├── lint.sh                   # Linter
+│   └── shared/utils.sh           # Slug validation
+├── templates/sprint_base/        # Templates .tmpl
+├── tests/                        # Tests Bash + Python
+├── src/utils.py                  # Python: is_valid_slug
+├── Makefile                      # Entrypoints
+└── pyproject.toml                # Python config
 ```
 
-### Configuración
+## Out of Scope
 
-Opcionalmente, configura `REVIEW_API_TOKEN` para usar el modo API. Sin él, el wrapper ejecuta en modo local-direct.
+- LLM integration
+- Git hooks
+- ADR generation
+- External tooling (code review, CI/CD)
+
+## For AI Agents
+
+1. Read `_ctx/ANCHOR.md` — project SSOT
+2. To work on a plan: load `_ctx/plans/<plan-id>/_ctx/ANCHOR.md`
+3. Read the plan's `PRIME.md` — answer all gates
+4. Read the plan's `AGENTS.md` — verify role
+5. Verify with `doctor.sh --active` or `doctor.sh <plan-id>`
+6. **Never delete `shared/utils.sh`**
+
+## Prerequisites
+
+- **Python 3.12+**, **uv**, **ShellCheck**
+
+## Installation
 
 ```bash
-export REVIEW_API_TOKEN=tu_token  # Opcional
+git clone <repo-url> && cd sprint-pack-kit && uv sync
 ```
 
-### Comandos
+## License
 
-```bash
-# Cargar wrappers
-source scripts/reviewctl-wrappers/reviewctl-wrapper.sh
-
-# Flujo completo (usa --reset para limpiar estado previo)
-reviewctl_full_workflow
-reviewctl_full_workflow --reset
-
-# Paso a paso
-reviewctl_init      # Iniciar revisión
-reviewctl_plan      # Generar plan
-reviewctl_run       # Ejecutar agentes
-reviewctl_verdict   # Obtener veredicto (PASS/FAIL)
-
-# Comandos adicionales
-reviewctl_status    # Ver estado actual
-reviewctl_explore   # Explorar contexto/diff
-```
-
-## Docs para Agentes IA
-
-Si eres un agente de IA operando en este repo:
-
-1. Leer `_ctx/ANCHOR.md` primero — es el SSOT soberano
-2. Leer `_ctx/PRIME.md` — responder todos los gates antes de tocar código
-3. Leer `_ctx/AGENTS.md` — verificar rol y restricciones
-4. Crear packs con `scripts/new_sprint_pack.sh <slug>`
-5. Verificar con `scripts/doctor.sh <directorio>`
-6. No eliminar `shared/utils.sh` (contiene validaciones de seguridad)
-7. Usa `reviewctl_*` para revisiones de código antes de merge
+MIT

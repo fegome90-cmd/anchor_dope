@@ -118,6 +118,26 @@ function main() {
     new | doctor)
         local project_root
         project_root=$(resolve_project_root "$(pwd)") || exit 1
+
+        if [ "$cmd" = "new" ]; then
+            if [ -d "$project_root/_ctx" ] && [ ! -d "$project_root/_ctx/plans" ]; then
+                echo -e "${YELLOW}⚠️  El proyecto tiene _ctx/ pero no _ctx/plans/.${NC}" >&2
+                echo -e "${YELLOW}   Esto puede ser una estructura vieja del kit.${NC}" >&2
+                echo -e "${YELLOW}   spk creará _ctx/plans/ sin tocar lo existente.${NC}" >&2
+                echo -e "${YELLOW}   Para migrar packs viejos, muévalos manualmente a _ctx/plans/.${NC}" >&2
+                echo "" >&2
+            fi
+            if [ -f "$project_root/_ctx/plans/active_plan.json" ]; then
+                local current_plan
+                current_plan=$(grep -o '"active_plan"[[:space:]]*:[[:space:]]*"[^"]*"' "$project_root/_ctx/plans/active_plan.json" 2>/dev/null | grep -o '"[^"]*"$' | tr -d '"')
+                if [ -n "$current_plan" ] && [ "$current_plan" != "null" ]; then
+                    echo -e "${YELLOW}📌 Plan activo actual: $current_plan${NC}" >&2
+                    echo -e "${YELLOW}   El nuevo plan reemplazará el puntero activo.${NC}" >&2
+                    echo "" >&2
+                fi
+            fi
+        fi
+
         local script_name
         case "$cmd" in
         new) script_name="new_sprint_pack" ;;

@@ -67,6 +67,8 @@ make lint          # ShellCheck + Mypy + Ruff
 
 ## Slug Rules
 
+Reglas canónicas en `_ctx/ANCHOR.md` → sección **Slug Rules**.
+
 - Solo minúsculas, números y guiones medios
 - No puede iniciar ni terminar con `-`
 - No puede tener guiones consecutivos (`--`)

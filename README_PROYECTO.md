@@ -1,7 +1,8 @@
 # Documentación: sprint-pack-kit
 
-**Documento derivado. Si contradice al Anchor, pierde.**
+**Documento derivado. En caso de conflicto, prevalece el Anchor.**
 **Derivado de:** `_ctx/ANCHOR.md`
+**Última actualización:** 2026-03-22 — Verificar alineación con el Anchor si pasó más de 1 sprint.
 
 ---
 
@@ -33,7 +34,5 @@ make lint                            # Ejecutar linters
 
 ## Slug Rules
 
-- Solo minúsculas, números y guiones medios
-- No puede iniciar ni terminar con `-`
-- No puede tener guiones consecutivos (`--`)
-- Regex: `^[a-z0-9]+(-[a-z0-9]+)*$`
+Reglas canónicas en `_ctx/ANCHOR.md` → sección **Slug Rules**.
+Resumen: `^[a-z0-9]+(-[a-z0-9]+)*$` — minúsculas, números, guiones medios, sin extremos ni consecutivos.

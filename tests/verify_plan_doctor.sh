@@ -119,6 +119,28 @@ EOF
         fail=$((fail + 1))
     fi
 
+    # Test 9: Doctor con plan inválido lista planes disponibles
+    bash "$SKELETON_SCRIPT" "list-test-plan" >/dev/null 2>&1
+    echo -e "\n${YELLOW}[TEST] Doctor con plan inválido lista planes${NC}"
+    local listing_output
+    listing_output=$(bash "$DOCTOR_SCRIPT" "invalid-plan" 2>&1)
+    if echo "$listing_output" | grep -q "list-test-plan"; then
+        echo -e "${GREEN}PASS:${NC} Doctor con plan inválido lista planes"
+        pass=$((pass + 1))
+    else
+        echo -e "${RED}FAIL:${NC} Listing no contiene 'list-test-plan'"
+        fail=$((fail + 1))
+    fi
+
+    # Test 10: Doctor --active con JSON malformado
+    mkdir -p "_ctx/plans"
+    echo "not json at all" > "_ctx/plans/active_plan.json"
+    if run_test "Doctor --active con JSON malformado" 1 bash "$DOCTOR_SCRIPT" --active; then
+        pass=$((pass + 1))
+    else
+        fail=$((fail + 1))
+    fi
+
     cd "$original_dir" || exit 1
 
     echo -e "\n------------------------------------------------"

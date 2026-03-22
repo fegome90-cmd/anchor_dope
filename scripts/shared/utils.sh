@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2034
+RED='\033[0;31m'
+# shellcheck disable=SC2034
+GREEN='\033[0;32m'
+# shellcheck disable=SC2034
+YELLOW='\033[0;33m'
+# shellcheck disable=SC2034
+NC='\033[0m'
+
+if [[ -n "${NO_COLOR:-}" ]] || [[ "${TERM:-}" == "dumb" ]]; then
+    RED=""
+    GREEN=""
+    YELLOW=""
+    NC=""
+fi
+
 validate_slug() {
     local slug="${1:-}"
     if [ -z "$slug" ]; then

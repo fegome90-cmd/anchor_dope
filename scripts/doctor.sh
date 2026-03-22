@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-
-if [[ -n "${NO_COLOR:-}" ]] || [[ "${TERM:-}" == "dumb" ]]; then
-    RED=""
-    GREEN=""
-    YELLOW=""
-    NC=""
-fi
+# shellcheck disable=SC1091
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/shared/utils.sh"
 
 REQUIRED_FILES=("_ctx/ANCHOR.md" "_ctx/AGENTS.md" "_ctx/PRIME.md")
 PLANS_DIR="_ctx/plans"
@@ -40,24 +32,46 @@ EOM
     exit 1
 }
 
+function resolve_active() {
+    if [ ! -f "$ACTIVE_PLAN_FILE" ]; then
+        echo -e "${RED}ERROR: No existe $ACTIVE_PLAN_FILE.${NC}" >&2
+        echo -e "${YELLOW}Cree un plan primero con new_sprint_pack.sh <slug>.${NC}" >&2
+        return 1
+    fi
+
+    local plan_path
+    plan_path=$(grep -o '"plan_path"[[:space:]]*:[[:space:]]*"[^"]*"' "$ACTIVE_PLAN_FILE" 2>/dev/null | grep -o '"[^"]*"$' | tr -d '"')
+
+    if [ -z "$plan_path" ] || [ "$plan_path" = "null" ]; then
+        echo -e "${RED}ERROR: No hay plan activo en active_plan.json.${NC}" >&2
+        echo -e "${YELLOW}Cree un plan con new_sprint_pack.sh <slug>.${NC}" >&2
+        return 1
+    fi
+
+    echo "$plan_path"
+}
+
+function list_available_plans() {
+    echo -e "${YELLOW}Planes disponibles:${NC}" >&2
+    if [ -d "$PLANS_DIR" ]; then
+        local found=0
+        for d in "$PLANS_DIR"/*/; do
+            [ -d "$d" ] || continue
+            local plan_name
+            plan_name=$(basename "${d%/}")
+            echo -e "   $plan_name" >&2
+            found=1
+        done
+        [ "$found" -eq 0 ] && echo -e "   (ninguno)" >&2
+    fi
+}
+
 function resolve_plan_dir() {
     local input="$1"
 
     if [ "$input" = "--active" ]; then
-        if [ ! -f "$ACTIVE_PLAN_FILE" ]; then
-            echo -e "${RED}ERROR: No existe $ACTIVE_PLAN_FILE.${NC}" >&2
-            echo -e "${YELLOW}Cree un plan primero con new_sprint_pack.sh <slug>.${NC}" >&2
-            return 1
-        fi
-        local plan_path
-        plan_path=$(awk -F'"' '/"plan_path"/{for(i=1;i<=NF;i++)if($i=="plan_path"){v=$(i+2);if(v!="null"&&v!="")print v;exit}}' "$ACTIVE_PLAN_FILE")
-        if [ "$plan_path" = "null" ] || [ -z "$plan_path" ]; then
-            echo -e "${RED}ERROR: No hay plan activo en active_plan.json.${NC}" >&2
-            echo -e "${YELLOW}Cree un plan con new_sprint_pack.sh <slug>.${NC}" >&2
-            return 1
-        fi
-        echo "$plan_path"
-        return 0
+        resolve_active
+        return $?
     fi
 
     if [ -d "_ctx/plans/$input" ]; then
@@ -71,18 +85,7 @@ function resolve_plan_dir() {
     fi
 
     echo -e "${RED}ERROR: '$input' no es un plan ni un directorio válido.${NC}" >&2
-    echo -e "${YELLOW}Planes disponibles:${NC}" >&2
-    if [ -d "$PLANS_DIR" ]; then
-        local found=0
-        for d in "$PLANS_DIR"/*/; do
-            [ -d "$d" ] || continue
-            local plan_name
-            plan_name=$(basename "${d%/}")
-            echo -e "   $plan_name"
-            found=1
-        done
-        [ "$found" -eq 0 ] && echo -e "   (ninguno)"
-    fi
+    list_available_plans
     return 1
 }
 

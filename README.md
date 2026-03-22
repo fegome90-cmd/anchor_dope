@@ -22,6 +22,7 @@ Genera una carpeta con los documentos del sprint (`ANCHOR.md`, `SKILL.md`, `AGEN
 │   ├── new_sprint_pack.sh     # Generador de sprint packs
 │   ├── doctor.sh              # Validador de integridad
 │   ├── lint.sh                # ShellCheck linter
+│   ├── reviewctl-wrappers/    # Wrappers para branch-review
 │   └── shared/
 │       └── utils.sh           # Utilidades (validate_slug)
 ├── templates/
@@ -74,6 +75,52 @@ make lint          # ShellCheck + Mypy + Ruff
 Válidos: `sprint-01`, `mi-feature-alpha`, `v2`
 Inválidos: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
 
+## Code Review con reviewctl
+
+Este proyecto tiene integración con [branch-review](https://github.com/fegome90-cmd/branch-review) para revisiones de código automatizadas.
+
+### Requisitos
+
+- **bun** instalado (runtime para el CLI de branch-review)
+- **branch-review** clonado en `~/Developer/branch-review/` (o setear `BRANCH_REVIEW_REPO`)
+- Opcional: `REVIEW_API_TOKEN` para modo API (sin él, usa modo local-direct)
+
+```bash
+# Variables de entorno opcionales
+export BRANCH_REVIEW_REPO=~/Developer/branch-review  # Path al repo
+export REVIEW_API_TOKEN=tu_token                     # Para modo API
+export BRANCH_REVIEW_API=http://localhost:3001       # URL de la API
+```
+
+### Configuración
+
+Opcionalmente, configura `REVIEW_API_TOKEN` para usar el modo API. Sin él, el wrapper ejecuta en modo local-direct.
+
+```bash
+export REVIEW_API_TOKEN=tu_token  # Opcional
+```
+
+### Comandos
+
+```bash
+# Cargar wrappers
+source scripts/reviewctl-wrappers/reviewctl-wrapper.sh
+
+# Flujo completo (usa --reset para limpiar estado previo)
+reviewctl_full_workflow
+reviewctl_full_workflow --reset
+
+# Paso a paso
+reviewctl_init      # Iniciar revisión
+reviewctl_plan      # Generar plan
+reviewctl_run       # Ejecutar agentes
+reviewctl_verdict   # Obtener veredicto (PASS/FAIL)
+
+# Comandos adicionales
+reviewctl_status    # Ver estado actual
+reviewctl_explore   # Explorar contexto/diff
+```
+
 ## Docs para Agentes IA
 
 Si eres un agente de IA operando en este repo:
@@ -82,3 +129,4 @@ Si eres un agente de IA operando en este repo:
 2. Verifica con `scripts/doctor.sh <directorio>`
 3. No elimines `shared/utils.sh` (contiene validaciones de seguridad)
 4. El `_ctx/ANCHOR.md` es la fuente de verdad del proyecto
+5. Usa `reviewctl_*` para revisiones de código antes de merge

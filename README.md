@@ -127,8 +127,10 @@ reviewctl_explore   # Explorar contexto/diff
 
 Si eres un agente de IA operando en este repo:
 
-1. Crea packs con `scripts/new_sprint_pack.sh <slug>`
-2. Verifica con `scripts/doctor.sh <directorio>`
-3. No elimines `shared/utils.sh` (contiene validaciones de seguridad)
-4. El `_ctx/ANCHOR.md` es la fuente de verdad del proyecto
-5. Usa `reviewctl_*` para revisiones de código antes de merge
+1. Leer `_ctx/ANCHOR.md` primero — es el SSOT soberano
+2. Leer `_ctx/PRIME.md` — responder todos los gates antes de tocar código
+3. Leer `_ctx/AGENTS.md` — verificar rol y restricciones
+4. Crear packs con `scripts/new_sprint_pack.sh <slug>`
+5. Verificar con `scripts/doctor.sh <directorio>`
+6. No eliminar `shared/utils.sh` (contiene validaciones de seguridad)
+7. Usa `reviewctl_*` para revisiones de código antes de merge

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC1091
+SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SOURCE" ]; do
+    SPK_HOME="$(cd "$(dirname "$SOURCE")" && cd "$(dirname "$(readlink "$SOURCE")")" && pwd)"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ "$SOURCE" != /* ]] && SOURCE="$SPK_HOME/$SOURCE"
+done
+SPK_HOME="$(cd "$(dirname "$SOURCE")" && pwd)"
+source "$SPK_HOME/shared/utils.sh"
+
+function usage() {
+    cat <<EOM
+
+Sprint Pack Kit — CLI
+
+usage: spk <comando> [argumentos]
+
+comandos:
+    new <slug>           Crear un nuevo sprint pack
+    doctor [opción]      Verificar integridad de un pack
+    lint [dir]           Ejecutar ShellCheck
+    test                 Ejecutar tests
+    version              Mostrar versión
+
+opciones doctor:
+    --active             Auditar plan activo
+    <plan-id>            Auditar plan específico
+    <path>               Auditar directorio directo
+
+examples:
+    spk new sprint-01
+    spk doctor --active
+    spk doctor sprint-01
+    spk doctor ./mi-pack
+    spk lint
+    spk test
+
+EOM
+}
+
+function main() {
+    if [ $# -eq 0 ]; then
+        usage
+        exit 1
+    fi
+
+    local cmd="$1"
+    shift
+
+    case "$cmd" in
+    new)
+        bash "$SPK_HOME/new_sprint_pack.sh" "$@"
+        ;;
+    doctor)
+        bash "$SPK_HOME/doctor.sh" "$@"
+        ;;
+    lint)
+        bash "$SPK_HOME/lint.sh" "$@"
+        ;;
+    test)
+        bash "$SPK_HOME/../tests/run_all.sh"
+        ;;
+    version)
+        echo "spk 1.0.0"
+        ;;
+    -h | --help | help)
+        usage
+        ;;
+    *)
+        echo "ERROR: Comando desconocido '$cmd'" >&2
+        usage
+        exit 1
+        ;;
+    esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

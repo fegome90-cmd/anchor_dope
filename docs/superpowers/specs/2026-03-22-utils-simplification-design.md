@@ -23,11 +23,15 @@ Durante `/mr-quick` review se identificaron 4 sugerencias menores de simplificac
 
 **Antes:**
 ```python
+from typing import Final
+...
 SLUG_PATTERN: Final[re.Pattern[str]] = re.compile(...)
 ```
 
 **Después:**
 ```python
+import re  # Final import removed entirely
+...
 SLUG_PATTERN: re.Pattern[str] = re.compile(...)
 ```
 
@@ -35,6 +39,7 @@ SLUG_PATTERN: re.Pattern[str] = re.compile(...)
 - Nombre en MAYÚSCULAS indica constante por convención
 - `Final` es redundante para constantes de módulo
 - Reduce complejidad cognitiva
+- `from typing import Final` se elimina completamente
 
 ### 2. Simplificar docstring
 
@@ -74,22 +79,22 @@ __all__ = ["is_valid_slug", "SLUG_PATTERN"]
 
 ### 4. Reorganizar comentarios de tests
 
-**Antes:** Comentarios mezclados
+**Antes:** Comentarios mezclados sin estructura clara
 
 **Después:**
 ```python
 [
-    # === VALID ===
+    # Valid cases
     ("sprint-valido-01", True),
     ...
-    # === INVALID: empty ===
+    # Invalid: empty
     ("", False),
-    # === INVALID: uppercase ===
+    # Invalid: uppercase
     ("A", False),
-    # === INVALID: dash position ===
+    # Invalid: dash position
     ("-sprint", False),
     ...
-    # === INVALID: special chars ===
+    # Invalid: special chars
     ("a_b", False),
 ]
 ```
@@ -97,7 +102,7 @@ __all__ = ["is_valid_slug", "SLUG_PATTERN"]
 **Rationale:**
 - Agrupación por categoría mejora mantenibilidad
 - Más fácil agregar edge cases nuevos
-- Consistente con pattern de organizar tests
+- Mantiene estilo existente del proyecto (`# Category`)
 
 ---
 
@@ -105,7 +110,7 @@ __all__ = ["is_valid_slug", "SLUG_PATTERN"]
 
 | Métrica | Antes | Después |
 |---------|-------|---------|
-| Líneas utils.py | 24 | ~18 |
+| Líneas utils.py | 24 | ~17 |
 | Complejidad type hints | Alta | Baja |
 | Duplicación docs | Sí | No |
 | Organización tests | Plana | Por categoría |

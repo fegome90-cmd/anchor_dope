@@ -22,6 +22,7 @@ Genera una carpeta con los documentos del sprint (`ANCHOR.md`, `SKILL.md`, `AGEN
 │   ├── new_sprint_pack.sh     # Generador de sprint packs
 │   ├── doctor.sh              # Validador de integridad
 │   ├── lint.sh                # ShellCheck linter
+│   ├── reviewctl-wrappers/    # Wrappers para branch-review
 │   └── shared/
 │       └── utils.sh           # Utilidades (validate_slug)
 ├── templates/
@@ -74,6 +75,24 @@ make lint          # ShellCheck + Mypy + Ruff
 Válidos: `sprint-01`, `mi-feature-alpha`, `v2`
 Inválidos: `Sprint_01`, `-sprint`, `a--b`, `sprint-`
 
+## Code Review con reviewctl
+
+Este proyecto tiene integración con [branch-review](https://github.com/fegome90-cmd/branch-review) para revisiones de código automatizadas.
+
+```bash
+# Cargar wrappers
+source scripts/reviewctl-wrappers/reviewctl-wrapper.sh
+
+# Flujo completo de revisión
+reviewctl_full_workflow
+
+# O paso a paso
+reviewctl_init      # Iniciar revisión
+reviewctl_plan      # Generar plan
+reviewctl_run       # Ejecutar agentes
+reviewctl_verdict   # Obtener veredicto (PASS/FAIL)
+```
+
 ## Docs para Agentes IA
 
 Si eres un agente de IA operando en este repo:
@@ -82,3 +101,4 @@ Si eres un agente de IA operando en este repo:
 2. Verifica con `scripts/doctor.sh <directorio>`
 3. No elimines `shared/utils.sh` (contiene validaciones de seguridad)
 4. El `_ctx/ANCHOR.md` es la fuente de verdad del proyecto
+5. Usa `reviewctl_*` para revisiones de código antes de merge
